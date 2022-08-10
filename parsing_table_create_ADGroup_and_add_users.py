@@ -7,7 +7,7 @@ from ldap3.extend.microsoft.addMembersToGroups import ad_add_members_to_groups a
 LDAP_SERVER = "bam.loc"
 USERNAME = "_arch@BAM"
 WORD = argv
-GROUPOU = "OU=Группы распространения 1С (GPO),OU=Office,DC=bam,DC=loc"
+GROUPOU = "OU=1C-Bases,OU=Office,DC=bam,DC=loc"
 OBJECTCLASS = 'groupOfNames'
 
 base_with_users_dict = {}
@@ -21,7 +21,7 @@ group_list = []
 for item in conn.entries:
     if item.cn.value:
         group_list.append(item.cn.value)
-print(group_list)
+#print(group_list)
 
 attr = ['userAccountControl','DisplayName','distinguishedName']
 conn.search('OU=Office,DC=bam,DC=loc', '(objectCategory=person)', SUBTREE, attributes=attr)
@@ -34,10 +34,11 @@ for item in conn.entries:
 def add_user_in_group(user, users_dict, groupDN):
     keys = users_dict.keys()
     if user in keys:
+        #print(user)
         addUsersToGroups(conn, users_dict.get(user),groupDN)
 
 
-with open ('users_in_bases.csv', newline='', encoding="utf-8") as csvfile:
+with open ('../users_in_bases.csv', newline='', encoding="utf-8") as csvfile:
     #linereader = csv.reader(csvfile, delimiter=';', quotechar='|')
     base_dict = csv.DictReader(csvfile, dialect='excel', delimiter=';')
     dataset = [dict(row) for row in base_dict]
@@ -48,16 +49,20 @@ with open ('users_in_bases.csv', newline='', encoding="utf-8") as csvfile:
             groupDN = 'cn='+group_name+','+GROUPOU
             if key != "User":
                 if row.get(key) == "1":
-                    if base_with_users_dict.get(key):
-                        base_with_users_dict[key].append(user)
-                        add_user_in_group(user=user, users_dict=users_dict, groupDN=groupDN)
-                    else:
+                    if not base_with_users_dict.get(key):
                         base_with_users_dict[key] = [user]
+                        
                         if group_name not in group_list:
                             attr = {
                                 'cn': group_name,
                                 'description': 'Группа безопасности для базы '+ key
                             }
-                            conn.add(groupDN, 'Group', attr)
+                            #conn.add(groupDN, 'Group', attr)
                             group_list.append(group_name)
-                        
+                        add_user_in_group(user=user, users_dict=users_dict, groupDN=groupDN)
+                        print(user, key, users_dict.get(user))
+                    else:
+                        base_with_users_dict[key].append(user)
+                        add_user_in_group(user=user, users_dict=users_dict, groupDN=groupDN)       
+                        print(user, key, users_dict.get(user))
+print(f'Количество обработанных пользователей {}', len(base_with_users_dict.get("do_test")))                 
