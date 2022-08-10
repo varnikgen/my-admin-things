@@ -21,7 +21,6 @@ group_list = []
 for item in conn.entries:
     if item.cn.value:
         group_list.append(item.cn.value)
-#print(group_list)
 
 attr = ['userAccountControl','DisplayName','distinguishedName']
 conn.search('OU=Office,DC=bam,DC=loc', '(objectCategory=person)', SUBTREE, attributes=attr)
@@ -34,12 +33,10 @@ for item in conn.entries:
 def add_user_in_group(user, users_dict, groupDN):
     keys = users_dict.keys()
     if user in keys:
-        #print(user)
         addUsersToGroups(conn, users_dict.get(user),groupDN)
 
 
 with open ('../users_in_bases.csv', newline='', encoding="utf-8") as csvfile:
-    #linereader = csv.reader(csvfile, delimiter=';', quotechar='|')
     base_dict = csv.DictReader(csvfile, dialect='excel', delimiter=';')
     dataset = [dict(row) for row in base_dict]
     for row in dataset:
