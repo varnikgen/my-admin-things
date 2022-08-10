@@ -57,7 +57,7 @@ with open ('../users_in_bases.csv', newline='', encoding="utf-8") as csvfile:
                                 'cn': group_name,
                                 'description': 'Группа безопасности для базы '+ key
                             }
-                            #conn.add(groupDN, 'Group', attr)
+                            conn.add(groupDN, 'Group', attr)
                             group_list.append(group_name)
                         add_user_in_group(user=user, users_dict=users_dict, groupDN=groupDN)
                         print(user, key, users_dict.get(user))
