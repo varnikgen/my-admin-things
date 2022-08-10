@@ -65,4 +65,4 @@ with open ('../users_in_bases.csv', newline='', encoding="utf-8") as csvfile:
                         base_with_users_dict[key].append(user)
                         add_user_in_group(user=user, users_dict=users_dict, groupDN=groupDN)       
                         print(user, key, users_dict.get(user))
-print(f'Количество обработанных пользователей {}', len(base_with_users_dict.get("do_test")))                 
+print(f'Количество обработанных пользователей: {len(base_with_users_dict.get("do_test"))}')                 
